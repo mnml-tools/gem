@@ -70,10 +70,32 @@ fn check_main_capability() {
     );
 }
 
+/// tauri-build embeds the Windows application manifest (Common Controls v6, needed by the dialog
+/// APIs) into the app binary only, so the `cargo test` executables die at load with
+/// STATUS_ENTRYPOINT_NOT_FOUND. Embed it through the linker instead, for every target.
+/// Returns whether it did, so tauri-build can skip its own copy (a duplicate fails to link).
+fn embed_windows_manifest() -> bool {
+    let msvc = std::env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("windows")
+        && std::env::var("CARGO_CFG_TARGET_ENV").as_deref() == Ok("msvc");
+    if !msvc {
+        return false;
+    }
+    let manifest =
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("windows-app-manifest.xml");
+    println!("cargo:rerun-if-changed=windows-app-manifest.xml");
+    println!("cargo:rustc-link-arg=/MANIFEST:EMBED");
+    println!("cargo:rustc-link-arg=/MANIFESTINPUT:{}", manifest.display());
+    true
+}
+
 fn main() {
     check_main_capability();
-    let attributes = tauri_build::Attributes::new()
+    let mut attributes = tauri_build::Attributes::new()
         .app_manifest(tauri_build::AppManifest::new().commands(COMMANDS));
+    if embed_windows_manifest() {
+        attributes = attributes
+            .windows_attributes(tauri_build::WindowsAttributes::new_without_app_manifest());
+    }
     if let Err(error) = tauri_build::try_build(attributes) {
         panic!("tauri-build failed: {error:#}");
     }
