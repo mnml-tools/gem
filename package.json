@@ -33,7 +33,7 @@
     "servers:down": "docker compose -f dev/servers/docker-compose.yml down -v",
     "verify": "pnpm check && pnpm rust:check && pnpm build",
     "icons": "node scripts/build-icons.mjs",
-    "icons:png": "tauri icon src/assets/AppIcon.png",
+    "icons:png": "node scripts/build-flat-icons.mjs",
     "icons:mac": "node scripts/build-macos-icon.mjs"
   },
   "dependencies": {

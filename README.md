@@ -134,13 +134,13 @@ The installers are not signed, so SmartScreen warns on first run (More info › 
 ## App icons
 
 Edit `src-tauri/icons/AppIcon.icon` in Icon Composer, then run `pnpm icons` on macOS with
-Xcode 26 or newer selected. This exports a temporary PNG, regenerates desktop and mobile icon
-assets, and compiles the native macOS icon catalog. The temporary PNG is removed afterward;
-`src/assets/AppIcon.png` is left unchanged. Other platforms use a flattened version of the
-default macOS appearance.
+Xcode 26 or newer selected. This exports a temporary PNG, builds `icon.icns` from it, and
+compiles the native macOS icon catalog. The temporary PNG is removed afterward. Linux, Windows
+and Android use the flat tile in `src/assets/AppIcon.png` instead, like the other co-op apps.
 
 Run `pnpm icons:mac` to compile only the native macOS icon catalog, or `pnpm icons:png` to
-regenerate standard assets from the checked-in PNG on any platform. macOS builds automatically
+regenerate the flat assets from `src/assets/AppIcon.png` on any platform (`icon.icns` and the
+iOS icons are left alone). macOS builds automatically
 compile and bundle the native catalog while retaining the ICNS fallback for older macOS versions.
 Desktop CI runs `pnpm icons` on macOS and `pnpm icons:png` on Linux and Windows.
 

@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createRequire } from 'node:module';
@@ -68,7 +68,11 @@ try {
     '1',
   ]);
 
-  run(process.execPath, [tauriCli, 'icon', exportedIcon]);
+  // Only the macOS icon keeps the Icon Composer look; other platforms use the flat tile.
+  const macOutput = join(temporaryDirectory, 'mac');
+  run(process.execPath, [tauriCli, 'icon', exportedIcon, '--output', macOutput]);
+  copyFileSync(join(macOutput, 'icon.icns'), join(project, 'src-tauri/icons/icon.icns'));
+  run(process.execPath, ['scripts/build-flat-icons.mjs']);
   run(process.execPath, ['scripts/build-macos-icon.mjs']);
 } finally {
   rmSync(temporaryDirectory, { recursive: true, force: true });
