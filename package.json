@@ -31,7 +31,10 @@
     "bindings": "cargo test --manifest-path src-tauri/Cargo.toml --locked export_bindings",
     "servers:up": "docker compose -f dev/servers/docker-compose.yml up -d --build --wait",
     "servers:down": "docker compose -f dev/servers/docker-compose.yml down -v",
-    "verify": "pnpm check && pnpm rust:check && pnpm build"
+    "verify": "pnpm check && pnpm rust:check && pnpm build",
+    "icons": "node scripts/build-icons.mjs",
+    "icons:png": "tauri icon src/assets/AppIcon.png",
+    "icons:mac": "node scripts/build-macos-icon.mjs"
   },
   "dependencies": {
     "@codemirror/commands": "6.11.1",

@@ -73,7 +73,7 @@ jobs:
             os: ubuntu-22.04
             args: --bundles deb,rpm,appimage
           - platform: macos-universal
-            os: macos-latest
+            os: macos-26
             args: --target universal-apple-darwin --bundles app,dmg
           - platform: windows-x86_64
             os: windows-latest
@@ -117,6 +117,12 @@ jobs:
             echo "::error::Tag $RELEASE_TAG does not match the app version $version"
             exit 1
           fi
+      - name: Generate icons from Icon Composer
+        if: runner.os == 'macOS'
+        run: pnpm icons
+      - name: Generate icons from exported PNG
+        if: runner.os != 'macOS'
+        run: pnpm icons:png
       # beforeBuildCommand also regenerates the third-party licence notices shipped in the package.
       - name: Build desktop packages
         run: pnpm tauri build --ci ${{ matrix.args }}

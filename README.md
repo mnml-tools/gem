@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="src/assets/AppIcon.png" width="112" height="112" alt="Gem app icon">
+</p>
+
 <h1 align="center">Gem</h1>
 
 <p align="center">
@@ -106,7 +110,7 @@ Packages are not signed; publish checksums with them.
 
 ### macOS
 
-On a Mac with the Xcode command line tools installed, run:
+On a Mac with Xcode 26 or newer selected with `xcode-select`, run:
 
 ```sh
 rustup target add aarch64-apple-darwin x86_64-apple-darwin
@@ -126,6 +130,19 @@ pnpm tauri build --bundles nsis,msi
 ```
 
 The installers are not signed, so SmartScreen warns on first run (More info › Run anyway).
+
+## App icons
+
+Edit `src-tauri/icons/AppIcon.icon` in Icon Composer, then run `pnpm icons` on macOS with
+Xcode 26 or newer selected. This exports a temporary PNG, regenerates desktop and mobile icon
+assets, and compiles the native macOS icon catalog. The temporary PNG is removed afterward;
+`src/assets/AppIcon.png` is left unchanged. Other platforms use a flattened version of the
+default macOS appearance.
+
+Run `pnpm icons:mac` to compile only the native macOS icon catalog, or `pnpm icons:png` to
+regenerate standard assets from the checked-in PNG on any platform. macOS builds automatically
+compile and bundle the native catalog while retaining the ICNS fallback for older macOS versions.
+Desktop CI runs `pnpm icons` on macOS and `pnpm icons:png` on Linux and Windows.
 
 ## Automated desktop builds
 
