@@ -13,7 +13,9 @@ const out = join(root, 'src-tauri', 'resources', 'THIRD_PARTY_LICENSES.md');
 const LICENSE_FILE = /^(licen[cs]e|copying|notice)([.-].*)?$/i;
 
 function run(cmd, args, cwd = root) {
-  return execFileSync(cmd, args, { cwd, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 });
+  // On Windows pnpm is a .cmd shim, which Node can only spawn through a shell.
+  const shell = process.platform === 'win32' && cmd === 'pnpm';
+  return execFileSync(cmd, args, { cwd, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, shell });
 }
 
 function licenseTexts(dir) {
