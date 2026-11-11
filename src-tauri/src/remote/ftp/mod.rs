@@ -169,7 +169,10 @@ async fn open_control_with(
                 )?;
                 logger.command("AUTH TLS");
                 let ftp = ftp
-                    .into_secure(Connector::new(config, logger.clone()), &params.host)
+                    .into_secure(
+                        Connector::new(config, logger.clone(), timeout),
+                        &params.host,
+                    )
                     .await
                     .map_err(|error| match error {
                         FtpError::UnexpectedResponse(response) => {
@@ -196,7 +199,7 @@ async fn open_control_with(
                 )?;
                 let mut ftp = AsyncRustlsFtpStream::connect_secure_implicit(
                     address,
-                    Connector::new(config, logger.clone()),
+                    Connector::new(config, logger.clone(), timeout),
                     &params.host,
                 )
                 .await

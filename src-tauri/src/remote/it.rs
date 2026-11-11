@@ -166,6 +166,15 @@ impl Capture {
         texts[texts.len().saturating_sub(count)..].join("\n")
     }
 
+    /// Prints the last log lines (with timestamps) if the test panics while the guard lives:
+    /// an intermittent failure in CI leaves no other trace of what the session was doing.
+    fn dump_on_panic(&self, name: &'static str) -> DumpOnPanic {
+        DumpOnPanic {
+            name,
+            capture: self.clone(),
+        }
+    }
+
     fn assert_no_secrets(&self, name: &str) {
         let texts = self.texts();
         assert!(!texts.is_empty(), "{name}: nothing was logged");
@@ -176,6 +185,24 @@ impl Capture {
                 "{name}: passphrase in log: {text}"
             );
             assert!(!text.contains("PRIVATE KEY"), "{name}: key material in log");
+        }
+    }
+}
+
+struct DumpOnPanic {
+    name: &'static str,
+    capture: Capture,
+}
+
+impl Drop for DumpOnPanic {
+    fn drop(&mut self) {
+        if !std::thread::panicking() {
+            return;
+        }
+        let lines = self.capture.0.lock().map(|l| l.clone()).unwrap_or_default();
+        eprintln!("{}: last log lines before the failure:", self.name);
+        for line in &lines[lines.len().saturating_sub(80)..] {
+            eprintln!("  {} [{:?}] {}", line.ts, line.kind, line.text);
         }
     }
 }
@@ -381,6 +408,7 @@ async fn leftovers(fs: &dyn RemoteFs, dir: &str) -> Vec<String> {
 async fn suite(target: Target) {
     let started = Instant::now();
     let capture = Capture::default();
+    let _dump = capture.dump_on_panic(target.name);
     let verifier = Verifier::new(true);
     let conn = target
         .connect(verifier.clone(), capture.logger())

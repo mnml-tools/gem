@@ -106,6 +106,9 @@ jobs:
         run: pnpm servers:up
       - name: Integration tests against real servers
         run: pnpm rust:it
+      - name: Test server logs
+        if: failure()
+        run: docker compose -f dev/servers/docker-compose.yml logs --tail=500 ftp proftpd
       - name: Stop the test servers
         if: always()
         run: pnpm servers:down

@@ -9,6 +9,7 @@
 
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 
 use async_trait::async_trait;
 use suppaftp::tokio::{AsyncRustlsStream, AsyncTlsConnector};
@@ -213,18 +214,23 @@ pub fn client_config(
 }
 
 /// suppaftp TLS connector that logs the negotiated protocol of the control connection.
+/// Every handshake (control and data connections) is bounded by `timeout`: suppaftp sets none,
+/// and a server that never answers would otherwise hold the session until its own data
+/// timeout (300 s on vsftpd).
 pub struct Connector {
     inner: TlsConnector,
     logger: Logger,
     announce: AtomicBool,
+    timeout: Duration,
 }
 
 impl Connector {
-    pub fn new(config: Arc<ClientConfig>, logger: Logger) -> Self {
+    pub fn new(config: Arc<ClientConfig>, logger: Logger, timeout: Duration) -> Self {
         Self {
             inner: TlsConnector::from(config),
             logger,
             announce: AtomicBool::new(true),
+            timeout,
         }
     }
 }
@@ -242,10 +248,14 @@ impl AsyncTlsConnector for Connector {
     async fn connect(&self, domain: &str, stream: TcpStream) -> FtpResult<Self::Stream> {
         let name = ServerName::try_from(domain.to_owned())
             .map_err(|error| FtpError::SecureError(error.to_string()))?;
-        let tls = self
-            .inner
-            .connect(name, stream)
+        let tls = tokio::time::timeout(self.timeout, self.inner.connect(name, stream))
             .await
+            .map_err(|_| {
+                FtpError::SecureError(format!(
+                    "TLS handshake timed out after {} s",
+                    self.timeout.as_secs()
+                ))
+            })?
             .map_err(|error| FtpError::SecureError(error.to_string()))?;
         if self.announce.swap(false, Ordering::AcqRel) {
             let (_, connection) = tls.get_ref();
