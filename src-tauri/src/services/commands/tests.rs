@@ -1,7 +1,7 @@
 //! Remote command tests against the scripted in-memory shell.
 
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use super::*;
 use crate::domain::command::{CommandEvent, CommandStream};
@@ -193,16 +193,21 @@ async fn output_is_batched() {
     );
     let (session, _) = connected(&env).await;
     let (events, sink) = recorder();
+    let started = Instant::now();
     run(&session, "chatty", None, sink).unwrap();
     let seen = finished(&events).await;
+    let elapsed = started.elapsed();
     let outputs = seen
         .iter()
         .filter(|e| matches!(e, CommandEvent::Output { .. }))
         .count();
     assert_eq!(text(&seen, CommandStream::Stdout), "line\n".repeat(chunks));
+    // At most one event per batch window (plus the first tick and the final flush). Bounded by
+    // time, not chunk count: a 1 ms sleep lasts ~15 ms on Windows, so the run is ~15x longer.
+    let windows = (elapsed.as_millis() / BATCH.as_millis()) as usize;
     assert!(
-        outputs < chunks / 5,
-        "{outputs} output events for {chunks} chunks"
+        outputs <= windows + 2 && outputs < chunks,
+        "{outputs} output events for {chunks} chunks in {elapsed:?}"
     );
 }
 
