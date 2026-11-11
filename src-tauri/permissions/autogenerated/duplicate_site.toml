@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-duplicate-site"
+description = "Enables the duplicate_site command without any pre-configured scope."
+commands.allow = ["duplicate_site"]
+
+[[permission]]
+identifier = "deny-duplicate-site"
+description = "Denies the duplicate_site command without any pre-configured scope."
+commands.deny = ["duplicate_site"]

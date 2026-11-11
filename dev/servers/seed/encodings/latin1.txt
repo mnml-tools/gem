@@ -1,0 +1,2 @@
+résumé=naïve café
+linha=ação

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-update-site"
+description = "Enables the update_site command without any pre-configured scope."
+commands.allow = ["update_site"]
+
+[[permission]]
+identifier = "deny-update-site"
+description = "Denies the update_site command without any pre-configured scope."
+commands.deny = ["update_site"]

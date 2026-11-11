@@ -1,0 +1,2053 @@
+/*
+ * Gem's views on top of the kit (`mnml-*` classes). Tokens only: every colour is a kit token
+ * or a `--gem-*` token from tokens.css. Sizes follow plan §3.7: 36px title bar, 32px strips,
+ * 24px status bar, 27px rows, 26px controls.
+ */
+
+/* Element defaults belong to the kit's base layer, so kit components still win. */
+@layer mnml.base {
+  h1,
+  h2,
+  h3 {
+    margin: 0;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------- Shell */
+
+.gem-main {
+  flex: 1;
+  min-height: 0;
+}
+
+.gem-tab-body {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+}
+
+.mnml-titlebar .gem-titlebar-button {
+  pointer-events: auto;
+  width: 26px;
+  margin-right: 4px;
+  color: var(--secondary);
+}
+
+.mnml-titlebar .gem-titlebar-button svg {
+  pointer-events: none;
+}
+
+/* Centred on the window, as Zap's connection summary. */
+.gem-title-center {
+  position: absolute;
+  inset-inline: min(34%, 260px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 11px;
+  white-space: nowrap;
+  color: var(--secondary);
+}
+
+.gem-title-center strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.gem-title-protocol {
+  border-left: 1px solid var(--border);
+  padding-left: 7px;
+}
+
+.gem-title-status {
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .gem-title-status,
+  .gem-title-protocol {
+    display: none;
+  }
+}
+
+.gem-session-dot[data-state='disconnected'],
+.gem-session-dot[data-state='idle'] {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--muted);
+}
+
+.gem-session-dot[data-state='failed'] {
+  background: var(--gem-danger-text);
+}
+
+.gem-session-spinner {
+  display: inline-flex;
+  color: var(--muted);
+}
+
+.gem-badge-insecure {
+  padding: 1px 5px;
+  border-color: var(--notice-border);
+  background: var(--notice-bg);
+  color: var(--notice-text);
+  font-size: 9px;
+}
+
+.gem-status-start {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 12px;
+}
+
+.mnml-statusbar > span:last-child {
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- Tab strips */
+
+.gem-conn-tabs {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.gem-conn-tabs .mnml-tabs {
+  flex: 1;
+  min-width: 0;
+}
+
+.gem-conn-tab-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mnml-tabs .gem-new-tab {
+  align-self: center;
+  flex-shrink: 0;
+  margin: 0 4px;
+  width: 24px;
+  min-height: 24px;
+}
+
+.mnml-tab button {
+  gap: 6px;
+}
+
+.gem-file-tabs .mnml-tab {
+  gap: 10px;
+}
+
+.gem-file-tab-title {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gem-file-tab-title[data-preview] {
+  font-style: italic;
+}
+
+/* ---------------------------------------------------------------- Connection tab */
+
+.gem-connection,
+.gem-connection-state {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gem-connection-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.gem-disconnected {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 3px 12px;
+  border-bottom: 1px solid var(--notice-border);
+  background: var(--notice-bg);
+  color: var(--notice-text);
+  font-size: 11px;
+}
+
+.gem-disconnected .mnml-button {
+  min-height: 22px;
+  padding: 2px 8px;
+  font-size: 11px;
+  margin-left: auto;
+}
+
+.gem-list-pane {
+  position: relative;
+  flex-shrink: 0;
+  min-width: 0;
+  display: flex;
+  border-right: 1px solid var(--border);
+  container: list / inline-size;
+}
+
+.gem-list-pane:not([data-full]) {
+  /* The viewer keeps at least 280px however wide the list was dragged. */
+  max-width: calc(100% - 280px);
+}
+
+.gem-list-pane[data-full] {
+  flex: 1;
+  border-right: 0;
+}
+
+/* ---------------------------------------------------------------- File list */
+
+.gem-browser {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  --gem-file-columns: minmax(0, 1fr) 70px 82px 84px;
+}
+
+.gem-browser:has(.gem-file-header[data-owner]) {
+  --gem-file-columns: minmax(0, 1fr) 70px 82px 84px 120px;
+}
+
+@container list (max-width: 560px) {
+  .gem-browser,
+  .gem-browser:has(.gem-file-header[data-owner]) {
+    --gem-file-columns: minmax(0, 1fr) 64px 76px;
+  }
+
+  .gem-file-header [data-column='permissions'],
+  .gem-file-header [data-column='owner'],
+  .gem-file-mode,
+  .gem-file-owner {
+    display: none;
+  }
+}
+
+@container list (max-width: 340px) {
+  .gem-browser,
+  .gem-browser:has(.gem-file-header[data-owner]) {
+    --gem-file-columns: minmax(0, 1fr) 64px;
+  }
+
+  .gem-file-header [data-column='modified'],
+  .gem-file-date {
+    display: none;
+  }
+}
+
+.gem-browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 37px;
+  padding: 4px 8px 4px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.gem-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+.gem-toolbar .mnml-icon-button {
+  width: 26px;
+  min-height: 26px;
+}
+
+.gem-toolbar .mnml-icon-button[aria-pressed='true'] {
+  background: var(--selected);
+}
+
+.gem-browser-filter {
+  display: flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 2px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--raised);
+}
+
+.gem-browser-filter .mnml-search {
+  flex: 1;
+}
+
+.gem-browser-filter .mnml-search input {
+  width: 100%;
+}
+
+.gem-file-header {
+  display: grid;
+  grid-template-columns: var(--gem-file-columns);
+  gap: 10px;
+  flex-shrink: 0;
+  height: 26px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--soft);
+}
+
+.gem-file-header button {
+  justify-content: flex-start;
+  gap: 3px;
+  min-height: 25px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--secondary);
+  font: 10px var(--mono);
+  overflow: hidden;
+}
+
+.gem-file-header button:hover {
+  background: transparent;
+  color: var(--text);
+}
+
+.gem-file-header button[data-active] {
+  color: var(--text);
+}
+
+.gem-file-header [data-column='size'] {
+  justify-content: flex-end;
+}
+
+.gem-file-list {
+  flex: 1;
+  outline: none;
+}
+
+.gem-file-row {
+  display: grid;
+  grid-template-columns: var(--gem-file-columns);
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px 0 10px;
+  border-left: 2px solid transparent;
+  font-size: 12px;
+  cursor: default;
+  user-select: none;
+}
+
+.gem-file-row:hover {
+  background: var(--soft);
+}
+
+.gem-file-row[aria-selected='true'] {
+  background: var(--selected);
+  border-left-color: var(--focus);
+}
+
+.gem-file-list:focus-visible .gem-file-row[data-cursor] {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: -1px;
+}
+
+.gem-file-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.gem-file-name svg {
+  flex-shrink: 0;
+  color: var(--icon);
+}
+
+.gem-file-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gem-file-name[data-broken] .gem-file-label {
+  color: var(--muted);
+}
+
+.gem-file-link {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.gem-file-size,
+.gem-file-date,
+.gem-file-mode,
+.gem-file-owner {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--secondary);
+  font: 11px var(--mono);
+}
+
+.gem-file-size {
+  text-align: right;
+}
+
+.gem-file-list > .mnml-empty-state,
+.gem-file-list > .gem-list-message {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.gem-list-message {
+  padding: 24px;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+}
+
+.gem-empty-action {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.gem-browser[data-dropping] .gem-file-list {
+  background: var(--gem-drop-target);
+  box-shadow: inset 0 0 0 2px var(--focus);
+}
+
+.gem-file-row[data-drop-target] {
+  background: var(--gem-drop-target);
+  box-shadow: inset 0 0 0 1px var(--focus);
+}
+
+.gem-drop-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  max-width: calc(100% - 24px);
+  padding: 4px 10px;
+  border: 1px solid var(--faint);
+  background: var(--background);
+  box-shadow: 0 3px 10px var(--shadow);
+  font: 11px var(--mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.gem-menu-wide {
+  width: 230px;
+}
+
+.mnml-menu {
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+}
+
+/* ---------------------------------------------------------------- Viewer */
+
+.gem-viewer {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gem-viewer-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gem-viewer-code {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.gem-viewer-state {
+  margin: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.gem-partial-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 3px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--raised);
+  color: var(--secondary);
+  font: 11px var(--mono);
+}
+
+.gem-partial-bar > span {
+  margin-right: auto;
+}
+
+.gem-partial-bar .mnml-button,
+.gem-transfer-actions .mnml-button {
+  min-height: 22px;
+  padding: 2px 8px;
+  font: 11px inherit;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.gem-viewer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 24px;
+  flex-shrink: 0;
+  padding: 0 6px 0 8px;
+  border-top: 1px solid var(--border);
+  background: var(--soft);
+  color: var(--secondary);
+  font: 10px var(--mono);
+  white-space: nowrap;
+}
+
+.gem-viewer-footer-start,
+.gem-viewer-footer-end {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.gem-viewer-footer-end {
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* The kit's compact select (Pagination's page size): square, mono, a small drawn chevron. */
+.gem-language-picker {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 18px;
+  margin-right: 10px;
+  padding: 0 18px 0 5px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background-color: var(--background);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--secondary) 50%),
+    linear-gradient(135deg, var(--secondary) 50%, transparent 50%);
+  background-position:
+    right 9px center,
+    right 5px center;
+  background-size: 4px 4px;
+  background-repeat: no-repeat;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.gem-language-picker:hover:not(:disabled) {
+  border-color: var(--control-border);
+}
+
+.gem-language-picker:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.gem-language-picker:focus-visible {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: -1px;
+}
+
+.gem-viewer-facts {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gem-read-only {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--notice-text);
+}
+
+.gem-footer-button {
+  min-height: 20px;
+  padding: 1px 5px;
+  gap: 4px;
+  border: 0;
+  background: transparent;
+  color: var(--secondary);
+  font: inherit;
+}
+
+.gem-footer-button[aria-pressed='true'] {
+  color: var(--text);
+  background: var(--selected);
+}
+
+/* ---------------------------------------------------------------- Bottom panel */
+
+.gem-panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gem-panel-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 31px;
+  flex-shrink: 0;
+  padding: 0 6px 0 12px;
+  background: var(--soft);
+}
+
+.gem-panel[data-open] .gem-panel-bar {
+  border-bottom: 1px solid var(--border);
+}
+
+.gem-panel-switch {
+  background: var(--background);
+}
+
+.gem-panel-switch button {
+  flex: none;
+  gap: 6px;
+  min-height: 22px;
+  padding: 2px 10px;
+}
+
+.gem-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.gem-panel-actions .mnml-icon-button {
+  width: 24px;
+}
+
+.gem-error-marker {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  background: var(--gem-danger-text);
+}
+
+.gem-count {
+  margin-left: 6px;
+  font: 10px var(--mono);
+  color: var(--muted);
+}
+
+.gem-panel-switch .gem-count {
+  margin-left: 0;
+}
+
+.gem-panel-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gem-panel-empty {
+  padding: 12px;
+}
+
+.gem-panel-empty h2 {
+  margin-top: 8px;
+}
+
+.gem-apply-all {
+  margin-right: 6px;
+}
+
+.gem-log {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gem-log-list {
+  flex: 1;
+  outline: none;
+  padding-top: 2px;
+}
+
+.gem-log-row {
+  display: grid;
+  grid-template-columns: 62px 68px minmax(0, 1fr);
+  gap: 8px;
+  padding: 0 12px;
+  font: 11px/20px var(--mono);
+  color: var(--text);
+  cursor: default;
+}
+
+.gem-log-row[aria-selected='true'] {
+  background: var(--selected);
+}
+
+.gem-log-time {
+  color: var(--muted);
+}
+
+.gem-log-kind {
+  color: var(--secondary);
+}
+
+.gem-log-row[data-kind='command'] .gem-log-kind {
+  color: var(--gem-accent-text);
+}
+
+.gem-log-row[data-kind='error'] .gem-log-kind,
+.gem-log-row[data-kind='error'] .gem-log-text {
+  color: var(--gem-danger-text);
+}
+
+.gem-log-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre;
+}
+
+.gem-log-list > .gem-list-message {
+  position: absolute;
+  inset: 0;
+}
+
+.gem-log-resume {
+  position: absolute;
+  right: 14px;
+  bottom: 8px;
+  min-height: 22px;
+  padding: 2px 8px;
+  font-size: 11px;
+  box-shadow: 0 3px 10px var(--shadow);
+}
+
+.gem-transfer-list {
+  flex: 1;
+}
+
+.gem-transfer-list {
+  /* The actions column fits Cancel / Retry, or the three conflict answers when any row asks. */
+  --gem-transfer-actions: 64px;
+}
+
+.gem-transfer-list[data-conflicts] {
+  --gem-transfer-actions: 196px;
+}
+
+/* Direction · name and path (flexible) · progress · rate or size · state · actions. */
+.gem-transfer-row {
+  display: grid;
+  grid-template-columns:
+    14px minmax(0, 1fr) 120px 72px minmax(0, 150px)
+    var(--gem-transfer-actions);
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--hover);
+  font-size: 11px;
+}
+
+.gem-transfer-direction {
+  display: flex;
+  color: var(--icon);
+}
+
+.gem-transfer-what {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.gem-transfer-name {
+  flex-shrink: 0;
+  max-width: 50%;
+}
+
+.gem-transfer-path {
+  flex: 1;
+  min-width: 0;
+}
+
+.gem-transfer-name,
+.gem-transfer-path,
+.gem-transfer-state {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gem-transfer-path,
+.gem-transfer-size {
+  color: var(--muted);
+  font: 10px var(--mono);
+}
+
+.gem-transfer-size {
+  text-align: right;
+}
+
+.gem-transfer-state {
+  color: var(--secondary);
+}
+
+.gem-transfer-row[data-state='failed'] .gem-transfer-state {
+  color: var(--gem-danger-text);
+}
+
+.gem-transfer-row[data-state='conflict'] .gem-transfer-state {
+  color: var(--notice-text);
+}
+
+.gem-transfer-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+/* ---------------------------------------------------------------- Sites page */
+
+.gem-sites {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gem-sites-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 53px;
+  padding: 9px 16px;
+}
+
+.gem-sites-heading > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.gem-sites-heading h1 {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.gem-sites-heading h1 .gem-count {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.gem-sites-heading p {
+  margin: 0;
+  padding-left: 13px;
+  border-left: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.gem-sites-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.gem-sites-actions .mnml-button {
+  font-size: 11px;
+}
+
+.gem-quick-connect {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.gem-quick-connect label {
+  color: var(--secondary);
+  font-size: 11px;
+}
+
+.gem-quick-connect input {
+  flex: 1;
+  min-width: 160px;
+  max-width: 520px;
+  height: 26px;
+  padding: 3px 7px;
+  border: 1px solid var(--border);
+  background: var(--background);
+  font: 11px var(--mono);
+}
+
+.gem-quick-connect input::placeholder {
+  color: var(--placeholder);
+}
+
+.gem-quick-connect input:focus-visible {
+  border-color: var(--focus);
+  outline: none;
+}
+
+.gem-quick-connect .mnml-button {
+  font-size: 11px;
+}
+
+.gem-quick-connect .gem-field-error {
+  flex-basis: 100%;
+}
+
+.gem-sites-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 33px;
+  padding: 4px 16px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--raised);
+}
+
+.gem-sites-toolbar > span {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.gem-sites-toolbar .mnml-search {
+  flex: 1;
+}
+
+.gem-sites-toolbar .mnml-search input {
+  width: 100%;
+  max-width: 320px;
+}
+
+.gem-sites .mnml-empty-state {
+  margin: auto;
+}
+
+.gem-site-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.gem-site-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 47px;
+  padding: 7px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: default;
+}
+
+.gem-site-row:hover,
+.gem-site-row:focus-visible,
+.gem-site-row[data-menu] {
+  background: var(--hover);
+}
+
+.gem-site-row:focus-visible {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: -1px;
+}
+
+/* The selected site, as a selected row in Zap's sidebar: the selection fill and an accent bar. */
+.gem-site-row[data-selected] {
+  background: var(--selected);
+  box-shadow: inset 2px 0 0 var(--focus);
+}
+
+.gem-site-info {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+  min-width: 0;
+}
+
+.gem-site-info h3 {
+  min-width: 140px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.gem-site-info p {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font: 10px var(--mono);
+}
+
+.gem-site-row .gem-site-open {
+  padding: 3px;
+  border: 0;
+  background: transparent;
+}
+
+@media (max-width: 800px) {
+  .gem-site-info {
+    display: block;
+  }
+
+  .gem-site-info p {
+    margin-top: 4px;
+  }
+
+  .gem-sites-heading p,
+  .gem-sites-footer > span:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .gem-sites-actions .mnml-button:not([data-variant='primary']) {
+    display: none;
+  }
+}
+
+.gem-no-results {
+  padding: 25px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.gem-sites-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 12px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.gem-sites-footer > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gem-tiny-square {
+  width: 5px;
+  height: 5px;
+  border: 1px solid var(--faint);
+}
+
+/* ---------------------------------------------------------------- Dialogs and forms */
+
+.gem-site-dialog,
+.gem-settings-dialog {
+  width: 520px;
+}
+
+.gem-prompt-dialog {
+  width: 440px;
+}
+
+.gem-small-dialog {
+  width: 360px;
+}
+
+.gem-import-dialog {
+  width: 480px;
+}
+
+.gem-help-dialog {
+  width: 600px;
+}
+
+.gem-protocol-picker {
+  margin-bottom: 16px;
+}
+
+.gem-protocol-picker button {
+  padding: 7px 8px;
+}
+
+.gem-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  font-size: 11px;
+}
+
+.gem-field .mnml-segmented button {
+  padding: 6px 4px;
+}
+
+.gem-field-static {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  color: var(--faint);
+}
+
+.gem-field-error {
+  color: var(--gem-danger-text);
+  font-size: 10px;
+}
+
+.mnml-fields input[aria-invalid='true'] {
+  border-color: var(--gem-danger-text);
+}
+
+.mnml-fields input:focus-visible,
+.mnml-fields select:focus-visible {
+  border-color: var(--focus);
+  outline: none;
+}
+
+.gem-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.mnml-fields label.gem-check {
+  flex-direction: row;
+}
+
+.gem-check input,
+.mnml-fields .gem-check input {
+  width: auto;
+  height: auto;
+  margin: 0;
+  accent-color: var(--focus);
+}
+
+.gem-secret-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.gem-key-picker {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+}
+
+.gem-key-path {
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  padding: 6px 7px;
+  border: 1px solid var(--border);
+  background: var(--soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 11px var(--mono);
+  color: var(--secondary);
+}
+
+.gem-key-picker .mnml-button {
+  min-height: 28px;
+  font-size: 11px;
+}
+
+.gem-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-height: 28px;
+  align-items: center;
+}
+
+.gem-swatch.mnml-button {
+  width: 16px;
+  height: 16px;
+  min-height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--swatch);
+}
+
+.gem-swatch.mnml-button:hover {
+  background: var(--swatch);
+  outline: 1px solid var(--faint);
+  outline-offset: 1px;
+}
+
+.gem-swatch[aria-pressed='true'] {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+}
+
+.gem-form-notice {
+  margin: 12px 0 0;
+  padding: 7px 10px;
+  border: 1px solid var(--notice-border);
+  background: var(--notice-bg);
+  color: var(--notice-text);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.gem-test-result {
+  margin-top: 12px;
+}
+
+.gem-test-result .mnml-message {
+  margin-top: 0;
+}
+
+.gem-test-log {
+  max-height: 140px;
+  margin: 8px 0 0;
+  padding: 6px 8px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  background: var(--soft);
+  color: var(--secondary);
+  font: 10px/1.6 var(--mono);
+  white-space: pre-wrap;
+}
+
+.gem-test-log [data-kind='error'] {
+  color: var(--gem-danger-text);
+}
+
+.gem-test-trust {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.gem-test-trust .gem-key-facts {
+  background: var(--background);
+  color: var(--text);
+}
+
+.gem-test-trust-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.gem-dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.gem-dialog-footer > div {
+  display: flex;
+  gap: 6px;
+}
+
+.gem-dialog-footer .mnml-button {
+  font-size: 11px;
+}
+
+.gem-dialog-body {
+  padding: 14px 16px 0;
+}
+
+.gem-dialog-text {
+  margin: 0 0 12px;
+  color: var(--secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.gem-dialog form .gem-dialog-text,
+.gem-prompt-dialog form .gem-dialog-text {
+  margin-top: 0;
+}
+
+.gem-dialog-hint {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.gem-dialog-title-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gem-danger-text);
+}
+
+.gem-key-facts {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 12px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  background: var(--soft);
+}
+
+.gem-key-facts dt {
+  color: var(--secondary);
+  font-size: 11px;
+}
+
+.gem-key-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font: 11px var(--mono);
+}
+
+.gem-chmod {
+  margin: 0 0 14px;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.gem-chmod th,
+.gem-chmod td {
+  padding: 4px 12px 4px 0;
+  text-align: left;
+  font-weight: 400;
+}
+
+.gem-chmod thead th {
+  color: var(--secondary);
+}
+
+.gem-chmod input {
+  margin: 0;
+  accent-color: var(--focus);
+}
+
+.gem-chmod-preview {
+  align-self: end;
+  padding-bottom: 7px;
+  font: 12px var(--mono);
+  color: var(--secondary);
+}
+
+.mnml-button.gem-button-danger {
+  color: var(--gem-danger-text);
+}
+
+.mnml-button.gem-button-danger:hover {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: var(--on-danger);
+}
+
+.gem-conflict-dialog {
+  width: 420px;
+}
+
+.gem-settings-check {
+  align-self: end;
+  height: 28px;
+}
+
+.gem-help {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 24px;
+  padding: 14px 16px 0;
+}
+
+.gem-help h3 {
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.gem-help dl {
+  margin: 0;
+}
+
+.gem-help dl > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 22px;
+  font-size: 11px;
+}
+
+.gem-help dd {
+  margin: 0;
+}
+
+.gem-help kbd {
+  font-size: 10px;
+}
+
+@media (max-width: 640px) {
+  .gem-help {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gem-import-all {
+  margin-bottom: 8px;
+}
+
+.gem-import-list {
+  max-height: 280px;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+  border: 1px solid var(--border);
+}
+
+.gem-import-list li + li {
+  border-top: 1px solid var(--border);
+}
+
+.gem-import-list .gem-check {
+  padding: 6px 10px;
+}
+
+.gem-import-name {
+  min-width: 100px;
+  font-size: 12px;
+}
+
+.gem-import-address {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font: 10px var(--mono);
+}
+
+/* ---------------------------------------------------------------- Window chrome (Linux) */
+
+.gem-resize-edges {
+  position: fixed;
+  inset: 0;
+  z-index: 700;
+  pointer-events: none;
+}
+
+.gem-resize-edge {
+  position: absolute;
+  pointer-events: auto;
+}
+
+.gem-resize-edge[data-edge='North'],
+.gem-resize-edge[data-edge='South'] {
+  left: 10px;
+  right: 10px;
+  height: 5px;
+  cursor: ns-resize;
+}
+
+.gem-resize-edge[data-edge='North'] {
+  top: 0;
+}
+
+.gem-resize-edge[data-edge='South'] {
+  bottom: 0;
+}
+
+.gem-resize-edge[data-edge='West'],
+.gem-resize-edge[data-edge='East'] {
+  top: 10px;
+  bottom: 10px;
+  width: 5px;
+  cursor: ew-resize;
+}
+
+.gem-resize-edge[data-edge='West'] {
+  left: 0;
+}
+
+.gem-resize-edge[data-edge='East'] {
+  right: 0;
+}
+
+.gem-resize-edge[data-edge='NorthWest'],
+.gem-resize-edge[data-edge='SouthEast'],
+.gem-resize-edge[data-edge='NorthEast'],
+.gem-resize-edge[data-edge='SouthWest'] {
+  width: 10px;
+  height: 10px;
+}
+
+.gem-resize-edge[data-edge='NorthWest'] {
+  top: 0;
+  left: 0;
+  cursor: nwse-resize;
+}
+
+.gem-resize-edge[data-edge='SouthEast'] {
+  bottom: 0;
+  right: 0;
+  cursor: nwse-resize;
+}
+
+.gem-resize-edge[data-edge='NorthEast'] {
+  top: 0;
+  right: 0;
+  cursor: nesw-resize;
+}
+
+.gem-resize-edge[data-edge='SouthWest'] {
+  bottom: 0;
+  left: 0;
+  cursor: nesw-resize;
+}
+
+/* ---------------------------------------------------------------- Motion */
+
+.mnml-dialog[open] {
+  animation: gem-dialog-in var(--gem-duration-slow) ease-out;
+}
+
+.mnml-menu {
+  animation: gem-menu-in var(--gem-duration-normal) ease-out;
+}
+
+/* Entry motion moves, it never fades: a paused animation (a hidden or throttled webview) must
+   not leave a dialog or menu invisible. */
+@keyframes gem-dialog-in {
+  from {
+    transform: translateY(4px);
+  }
+}
+
+@keyframes gem-menu-in {
+  from {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mnml-dialog[open],
+  .mnml-menu,
+  .mnml-toast {
+    animation: none;
+  }
+
+  .mnml-spin {
+    animation-duration: 3s;
+  }
+}
+
+/* In dialogs (a white surface) the kit's selected segment needs a fill to stand out, as Zap's
+   driver picker. */
+.mnml-dialog .mnml-segmented button[aria-pressed='true'] {
+  background: var(--selected);
+  color: var(--text);
+}
+
+/* A form's actions sit 16px under its last field (the kit zeroes their padding in forms). */
+.mnml-dialog form > .mnml-dialog-actions {
+  margin-top: 16px;
+}
+
+.mnml-dialog-actions .gem-actions-start {
+  margin-right: auto;
+}
+
+/* An error region: icon and title, then the message, then the actions, centred together. */
+.gem-region-error {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(420px, calc(100% - 32px));
+  padding: 20px 0;
+}
+
+.gem-region-error .mnml-empty-state {
+  margin: 0;
+  padding: 0;
+}
+
+.gem-region-error .mnml-message[data-tone='error'] {
+  margin: 14px 0 0;
+  align-self: stretch;
+  text-align: left;
+}
+
+.gem-field-hint {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------------- Remote commands (ADR 0014) */
+
+.gem-file-tab-title[data-command] {
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.gem-command {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gem-command-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 3px 6px 3px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--raised);
+}
+
+.gem-command-icon {
+  flex-shrink: 0;
+  color: var(--icon);
+}
+
+.gem-command-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 11px var(--mono);
+  color: var(--text);
+  user-select: text;
+}
+
+.gem-command-bar .mnml-icon-button {
+  width: 22px;
+  min-height: 22px;
+  flex-shrink: 0;
+}
+
+.gem-command-spacer {
+  flex: 1;
+}
+
+.gem-command-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  font: 11px var(--mono);
+  color: var(--secondary);
+  white-space: nowrap;
+}
+
+.gem-command-state[data-state='ok'] {
+  color: var(--success-text);
+}
+
+.gem-command-state[data-state='error'],
+.gem-command-state[data-state='failed'] {
+  color: var(--gem-danger-text);
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gem-command-bar .mnml-button:not(.mnml-icon-button) {
+  flex-shrink: 0;
+  min-height: 22px;
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.gem-command-notice {
+  padding: 4px 12px;
+  border-bottom: 1px solid var(--notice-border);
+  background: var(--notice-bg);
+  color: var(--notice-text);
+  font-size: 11px;
+}
+
+.gem-command-output {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+/* stderr: danger ink over a faint danger wash, whatever the highlighting under it. */
+.mnml-code-view .cm-gem-stderr,
+.mnml-code-view .cm-gem-stderr span {
+  color: var(--gem-danger-text);
+}
+
+.mnml-code-view .cm-gem-stderr {
+  background: var(--gem-stderr-bg);
+}
+
+/* Command palette: Zap's Go To surface. */
+.gem-palette {
+  position: fixed;
+  top: 64px;
+  z-index: 550;
+  display: flex;
+  flex-direction: column;
+  max-height: min(480px, calc(100vh - 88px));
+  border: 1px solid var(--border);
+  background: var(--raised);
+  box-shadow: 0 8px 28px var(--shadow);
+  animation: gem-dialog-in var(--gem-duration-normal) ease-out;
+}
+
+.gem-palette-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.gem-palette-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--secondary);
+  font-size: 11px;
+}
+
+.gem-palette-site {
+  overflow: hidden;
+  margin-left: auto;
+  color: var(--muted);
+  font: 10px var(--mono);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.gem-palette-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.gem-palette-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: 13px var(--mono);
+}
+
+.gem-palette-search input::placeholder {
+  color: var(--placeholder);
+}
+
+.gem-palette-results {
+  overflow: auto;
+  padding: 4px;
+}
+
+.gem-palette-option {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  min-height: 26px;
+  padding: 4px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  font: 12px var(--mono);
+  cursor: pointer;
+}
+
+.gem-palette-option > svg {
+  flex-shrink: 0;
+  color: var(--icon);
+}
+
+.gem-palette-option:hover {
+  background: transparent;
+}
+
+.gem-palette-option[aria-selected='true'] {
+  background: var(--hover-strong);
+}
+
+.gem-palette-label,
+.gem-palette-detail {
+  overflow: hidden;
+  white-space: pre;
+  text-overflow: ellipsis;
+}
+
+.gem-palette-label {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.gem-palette-detail {
+  flex: 1 100 auto;
+  min-width: 40px;
+  color: var(--muted);
+}
+
+.gem-palette-option mark {
+  background: var(--edited-bg);
+  color: var(--edited-text);
+  font-weight: 600;
+}
+
+.gem-palette-scope {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 1px 5px;
+  font-size: 9px;
+}
+
+.gem-palette-footer {
+  margin: 0;
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.gem-palette-unavailable {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 22px 16px 16px;
+  color: var(--secondary);
+  font-size: 11px;
+  text-align: center;
+}
+
+.gem-palette-unavailable svg {
+  color: var(--faint);
+}
+
+.gem-palette-unavailable strong {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.gem-palette-unavailable .mnml-button {
+  margin-top: 8px;
+  font-size: 11px;
+}
+
+/* Manage snippets. */
+.gem-snippets-dialog {
+  width: 600px;
+}
+
+.gem-snippets-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gem-snippet-section header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.gem-snippet-section h3 {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.gem-snippet-section header > span {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.gem-snippet-section header .mnml-button {
+  margin-left: auto;
+  min-height: 22px;
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.gem-snippet-empty {
+  margin: 0;
+  padding: 10px;
+  border: 1px dashed var(--border);
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+}
+
+.gem-snippet-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--border);
+}
+
+.gem-snippet-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 30px;
+  padding: 2px 4px 2px 10px;
+  font-size: 12px;
+}
+
+.gem-snippet-list li + li {
+  border-top: 1px solid var(--border);
+}
+
+.gem-snippet-list li:focus-visible {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: -1px;
+}
+
+.gem-snippet-list li[data-selected] {
+  background: var(--selected);
+}
+
+.gem-snippet-name {
+  flex-shrink: 0;
+  max-width: 35%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gem-snippet-command {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--secondary);
+  font: 11px var(--mono);
+}
+
+.gem-snippet-asks {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  color: var(--notice-text);
+  font-size: 10px;
+}
+
+.gem-snippet-actions {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.gem-snippet-actions .mnml-icon-button {
+  width: 22px;
+  min-height: 22px;
+}
+
+.gem-snippet-input {
+  width: 100%;
+  min-height: 72px;
+  padding: 5px 7px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--background);
+  color: inherit;
+  font: 11px/1.5 var(--mono);
+  resize: vertical;
+}
+
+.gem-snippet-input:focus-visible {
+  border-color: var(--focus);
+  outline: none;
+}
+
+.gem-snippet-input[aria-invalid='true'] {
+  border-color: var(--gem-danger-text);
+}
+
+.gem-snippet-confirm {
+  align-self: end;
+  height: 28px;
+}
+
+.gem-confirm-command {
+  display: block;
+  margin-top: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  background: var(--soft);
+  color: var(--text);
+  font: 11px var(--mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

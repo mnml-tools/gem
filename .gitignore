@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+coverage/
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Logs and local data
+*.log
+*.sqlite
+*.sqlite3
+*.db
+.env
+.env.*
+!.env.example
+
+# Spikes keep their own lockfiles out of the repo
+spikes/**/node_modules/
+spikes/**/dist/
+
+# Native end-to-end output
+target-e2e/
+
+# Test server state
+dev/servers/.state/

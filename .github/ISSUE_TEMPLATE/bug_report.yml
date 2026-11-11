@@ -1,0 +1,67 @@
+name: Bug report
+description: Something doesn't work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Never paste real hostnames, users, passwords, keys or file contents from your servers — describe them instead.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Steps to reproduce, what you expected and what happened instead.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Gem version
+      placeholder: '0.1.0'
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Linux — KDE Plasma (Wayland)
+        - Linux — KDE Plasma (X11)
+        - Linux — GNOME (Wayland)
+        - Linux — GNOME (X11)
+        - Linux — other (say which in the details)
+        - Windows 11
+        - Windows 10
+        - macOS
+    validations:
+      required: true
+  - type: input
+    id: os-version
+    attributes:
+      label: OS / desktop version
+      placeholder: 'e.g. Fedora 43, Plasma 6.7; Windows 11 24H2; macOS 26.1'
+  - type: dropdown
+    id: protocol
+    attributes:
+      label: Protocol
+      options:
+        - SFTP
+        - FTP
+        - FTPS (explicit)
+        - FTPS (implicit)
+        - Not related to a connection
+  - type: input
+    id: server
+    attributes:
+      label: Server software (optional)
+      placeholder: 'e.g. OpenSSH 9.6, vsftpd 3.0.5, pure-ftpd, ProFTPD'
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs (optional)
+      description: |
+        The connection log (bottom panel → Log → Save log…) never contains passwords, but it
+        does contain host names and paths: mask them before pasting. The app log is in
+        Linux: ~/.local/share/app.gem.Gem/logs · Windows: %LOCALAPPDATA%\app.gem.Gem\logs ·
+        macOS: ~/Library/Logs/app.gem.Gem
+      render: text

@@ -1,0 +1,6 @@
+packages:
+  - .
+minimumReleaseAgeExclude:
+  - '@mnml-tools/ui@0.1.0'
+  - jsdom@31.0.0
+  - lucide-react@1.70.0

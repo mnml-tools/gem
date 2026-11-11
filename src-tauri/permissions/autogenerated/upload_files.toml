@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-upload-files"
+description = "Enables the upload_files command without any pre-configured scope."
+commands.allow = ["upload_files"]
+
+[[permission]]
+identifier = "deny-upload-files"
+description = "Denies the upload_files command without any pre-configured scope."
+commands.deny = ["upload_files"]

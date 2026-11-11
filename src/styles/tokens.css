@@ -1,0 +1,98 @@
+/*
+ * Gem tokens on top of @mnml-tools/ui (imported first in main.tsx): only what the kit lacks.
+ * Colours are aliases or `color-mix()`es of kit tokens, so they follow the colour mode and the
+ * accent. The only raw values are the family's code palette (identical to Zap's `--sql-*` and
+ * Piw's `--color-code-*`, so code looks the same in every mnml-tools app) and the site avatar
+ * palette (Zap's avatar shades).
+ * `tokens.test.ts` checks WCAG AA (4.5:1) for every text colour below on `--background`, in
+ * both modes and with every accent. Keep the `name: value;` one-per-line format: the test
+ * parses it.
+ */
+:root {
+  /* ---- Sizes (plan §3.7) ---- */
+  --gem-row-height: 27px;
+  --gem-strip-height: 32px;
+  --gem-control-height: 26px;
+
+  /* ---- Motion: 80 / 120 / 150 ms, zero under reduced motion ---- */
+  --gem-duration-fast: 80ms;
+  --gem-duration-normal: 120ms;
+  --gem-duration-slow: 150ms;
+
+  /* ---- Text colours derived from kit tokens (AA on --background) ---- */
+  --gem-danger-text: var(--danger);
+  --gem-accent-text: color-mix(in srgb, var(--accent) 75%, var(--text));
+  --gem-drop-target: color-mix(in srgb, var(--focus) 12%, var(--background));
+
+  /* ---- Family code palette (Zap --sql-*, Piw --color-code-*), AA on --background ---- */
+  --gem-code-keyword: #8053a2;
+  --gem-code-string: #3d754c;
+  --gem-code-number: #96602a;
+  --gem-code-function: #286e86;
+  --gem-code-comment: #6c6d62;
+  --gem-code-identifier: #856532;
+  --gem-code-parameter: #a55466;
+  --gem-code-operator: #6c7077;
+
+  /* ---- Syntax roles (CodeView) mapped onto the family palette ---- */
+  --gem-syntax-keyword: var(--gem-code-keyword);
+  --gem-syntax-function: var(--gem-code-function);
+  --gem-syntax-variable: var(--gem-code-parameter);
+  --gem-syntax-type: var(--gem-code-identifier);
+  --gem-syntax-string: var(--gem-code-string);
+  --gem-syntax-constant: var(--gem-code-number);
+  --gem-syntax-property: var(--gem-code-function);
+  --gem-syntax-tag: var(--gem-code-keyword);
+  --gem-syntax-regexp: var(--gem-code-number);
+  --gem-syntax-comment: var(--gem-code-comment);
+  --gem-syntax-meta: var(--gem-code-operator);
+  --gem-syntax-punctuation: var(--gem-code-operator);
+  --gem-syntax-invalid: var(--danger);
+  --gem-syntax-link: var(--gem-code-function);
+
+  /* ---- Editor chrome ---- */
+  --gem-code-selection: color-mix(in srgb, var(--focus) 26%, transparent);
+  --gem-code-selection-blur: color-mix(in srgb, var(--focus) 14%, transparent);
+  --gem-code-active-line: color-mix(in srgb, var(--hover) 55%, transparent);
+  --gem-code-bracket: color-mix(in srgb, var(--focus) 18%, transparent);
+  --gem-code-match-selected: color-mix(in srgb, var(--edited-accent) 45%, var(--background));
+  --gem-code-indent-guide: var(--border);
+  /* Remote command output written to stderr. */
+  --gem-stderr-bg: color-mix(in srgb, var(--danger) 7%, transparent);
+
+  /* ---- Site avatars (SiteColor), as Zap's connection avatars ---- */
+  --gem-site-gray: var(--muted);
+  --gem-site-red: #dc4b50;
+  --gem-site-orange: #f2571d;
+  --gem-site-yellow: #d6ab23;
+  --gem-site-green: #0d8a4b;
+  --gem-site-teal: #16a085;
+  --gem-site-blue: #1d8dba;
+  --gem-site-purple: #986dc4;
+  --gem-site-pink: #db4aa6;
+}
+
+:root[data-theme='dark'] {
+  --gem-danger-text: color-mix(in srgb, var(--danger) 50%, var(--text));
+  --gem-accent-text: color-mix(in srgb, var(--accent) 65%, var(--text));
+
+  --gem-code-keyword: #c49be0;
+  --gem-code-string: #a0c58b;
+  --gem-code-number: #dfb47c;
+  --gem-code-function: #80bdcf;
+  --gem-code-comment: #8b9180;
+  --gem-code-identifier: #dac18e;
+  --gem-code-parameter: #df95a9;
+  --gem-code-operator: #b3b9c4;
+  --gem-syntax-invalid: color-mix(in srgb, var(--danger) 50%, var(--text));
+
+  --gem-code-active-line: color-mix(in srgb, var(--hover) 45%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --gem-duration-fast: 0ms;
+    --gem-duration-normal: 0ms;
+    --gem-duration-slow: 0ms;
+  }
+}

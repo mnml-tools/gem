@@ -1,0 +1,29 @@
+# OpenSSH server for the Gem integration tests (test-only configuration).
+Port 22
+ListenAddress 0.0.0.0
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_rsa_key
+
+PermitRootLogin no
+PasswordAuthentication yes
+KbdInteractiveAuthentication no
+PubkeyAuthentication yes
+AuthorizedKeysFile /etc/ssh/authorized_keys/%u
+AllowUsers gem
+
+# Several SFTP channels per connection (browsing + transfers) and parallel test suites.
+MaxSessions 32
+MaxStartups 64:30:128
+MaxAuthTries 10
+# OpenSSH 10 penalises sources that fail authentication or connect without authenticating
+# (the healthcheck, the host-key tests) by refusing them for a while; the tests do both on
+# purpose, from one address, many times per run.
+PerSourcePenalties no
+LoginGraceTime 30
+
+AllowTcpForwarding no
+X11Forwarding no
+PrintMotd no
+LogLevel VERBOSE
+Subsystem sftp internal-sftp

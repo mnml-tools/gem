@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-import-sites-file"
+description = "Enables the import_sites_file command without any pre-configured scope."
+commands.allow = ["import_sites_file"]
+
+[[permission]]
+identifier = "deny-import-sites-file"
+description = "Denies the import_sites_file command without any pre-configured scope."
+commands.deny = ["import_sites_file"]

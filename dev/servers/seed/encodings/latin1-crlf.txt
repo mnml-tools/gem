@@ -1,0 +1,4 @@
+# Ficheiro de configuração (Windows-1252 / Latin-1)
+nome=José Conceição
+cidade=São João da Madeira
+nota=Café, pão e maçã — €5

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-chmod-path"
+description = "Enables the chmod_path command without any pre-configured scope."
+commands.allow = ["chmod_path"]
+
+[[permission]]
+identifier = "deny-chmod-path"
+description = "Denies the chmod_path command without any pre-configured scope."
+commands.deny = ["chmod_path"]

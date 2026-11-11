@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+  <book id="bk101">
+    <author>Example, Ada</author>
+    <title>Synthetic Data Guide</title>
+    <price currency="EUR">12.50</price>
+  </book>
+  <book id="bk102">
+    <author>Sample, Bob</author>
+    <title>Test Fixtures in Practice</title>
+    <price currency="EUR">9.90</price>
+  </book>
+</catalog>

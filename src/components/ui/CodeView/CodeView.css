@@ -1,0 +1,13 @@
+/* CodeView: fills its pane; CodeMirror's own theme lives in theme.ts (tokens only). */
+.mnml-code-view {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mnml-code-view > .cm-editor {
+  flex: 1;
+  min-height: 0;
+}

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-create-site"
+description = "Enables the create_site command without any pre-configured scope."
+commands.allow = ["create_site"]
+
+[[permission]]
+identifier = "deny-create-site"
+description = "Denies the create_site command without any pre-configured scope."
+commands.deny = ["create_site"]

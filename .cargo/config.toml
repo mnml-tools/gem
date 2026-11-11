@@ -1,0 +1,7 @@
+[env]
+# ts-rs writes TypeScript bindings next to the IPC client (see docs/architecture.md#ipc-contract). Lives at the repo
+# root so it applies whether cargo runs here (`--manifest-path`) or inside src-tauri/.
+TS_RS_EXPORT_DIR = { value = "src/lib/ipc", relative = true }
+# serde serialises i64 as a JSON number; every i64 we expose (revisions, counts, sort orders)
+# stays far below 2^53, so `number` is exact.
+TS_RS_LARGE_INT = "number"

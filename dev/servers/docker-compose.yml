@@ -1,0 +1,73 @@
+# Test servers for Gem's protocol integration tests and UI demos (`pnpm servers:up`).
+# Every port is bound to 127.0.0.1 only. All credentials and keys are test-only (see README.md).
+name: gem-test-servers
+
+services:
+  # One-shot: fills the shared `home` volume with the test tree, then exits.
+  seed:
+    build:
+      context: .
+      dockerfile: seeder/Dockerfile
+    volumes:
+      - home:/home/gem
+
+  sftp:
+    build:
+      context: .
+      dockerfile: sftp/Dockerfile
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    volumes:
+      - home:/home/gem
+    ports:
+      - '127.0.0.1:2222:22'
+    healthcheck:
+      test: ['CMD-SHELL', 'timeout 3 nc 127.0.0.1 22 </dev/null | grep -q SSH-2.0']
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  # vsftpd: plain FTP + explicit FTPS on 2121, implicit FTPS on 2990. LIST only (no MLSD).
+  ftp:
+    build:
+      context: .
+      dockerfile: ftp/Dockerfile
+    init: true
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    volumes:
+      - home:/home/gem
+    ports:
+      - '127.0.0.1:2121:21'
+      - '127.0.0.1:2990:990'
+      # Passive ports must be published 1:1 (the server announces them in PASV replies).
+      - '127.0.0.1:30000-30079:30000-30079'
+    healthcheck:
+      test: ['CMD-SHELL', "timeout 3 nc 127.0.0.1 21 </dev/null | grep -q '^220'"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  # ProFTPD: plain FTP + explicit FTPS on 2321, with FEAT/MLSD/MLST.
+  proftpd:
+    build:
+      context: .
+      dockerfile: proftpd/Dockerfile
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    volumes:
+      - home:/home/gem
+    ports:
+      - '127.0.0.1:2321:21'
+      - '127.0.0.1:30080-30159:30080-30159'
+    healthcheck:
+      test: ['CMD-SHELL', "timeout 3 nc 127.0.0.1 21 </dev/null | grep -q '^220'"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  home: {}

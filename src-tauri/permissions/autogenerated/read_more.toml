@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-read-more"
+description = "Enables the read_more command without any pre-configured scope."
+commands.allow = ["read_more"]
+
+[[permission]]
+identifier = "deny-read-more"
+description = "Denies the read_more command without any pre-configured scope."
+commands.deny = ["read_more"]

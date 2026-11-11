@@ -1,0 +1,72 @@
+[package]
+name = "gem"
+version = "0.1.0"
+description = "Minimal remote file manager for SFTP, FTP and FTPS."
+authors = ["Gem contributors"]
+license = "MIT"
+edition = "2024"
+rust-version = "1.90"
+publish = false
+
+[lib]
+# The `_lib` suffix avoids a name clash with the binary on Windows (cargo#8519).
+name = "gem_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.5", features = [] }
+
+[dependencies]
+tauri = { version = "2.12.5", features = [] }
+tauri-plugin-log = "2.10.1"
+tauri-plugin-dialog = "2.8.4"
+tauri-plugin-opener = "2.7.2"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+thiserror = "2.0.21"
+log = "0.4.35"
+uuid = { version = "1.29.0", features = ["v7"] }
+chrono = { version = "0.4.45", default-features = false, features = ["clock", "std"] }
+rusqlite = { version = "0.41.1", features = ["bundled"] }
+ts-rs = { version = "12.0.1", features = ["no-serde-warnings"] }
+tokio = { version = "1.54.1", default-features = false, features = ["sync", "macros", "rt", "rt-multi-thread", "time", "io-util", "fs", "net"] }
+async-trait = "0.1.92"
+# SSH/SFTP in pure Rust (no system `ssh`); `ring` instead of the default aws-lc-rs keeps the
+# build free of CMake/NASM on every platform and is shared with rustls for FTPS.
+russh = { version = "0.65.1", default-features = false, features = ["flate2", "ring", "rsa"] }
+russh-sftp = "3.0.1"
+# `deprecated` exposes `connect_secure_implicit`, the only implicit-FTPS entry point (ADR 0006).
+suppaftp = { version = "12.2.1", features = ["tokio-rustls-ring", "deprecated"] }
+encoding_rs = "0.8.44"
+sha2 = "0.10.9"
+base64 = "0.22.1"
+keyring = { version = "3.6.3", features = ["apple-native", "windows-native", "sync-secret-service", "crypto-rust"] }
+# FileZilla sitemanager.xml import (already in the tree through Tauri's plist support).
+quick-xml = "0.42.0"
+# Mozilla root certificates for FTPS (ADR 0003); self-signed servers are trusted by fingerprint.
+webpki-roots = "1.0.11"
+# Random suffixes for atomic-write temp files.
+getrandom = "0.3.4"
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-single-instance = "2.5.5"
+
+[dev-dependencies]
+tempfile = "3.27.0"
+tauri = { version = "2.12.5", features = ["test"] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true
+
+[lints.rust]
+unsafe_code = "deny"
+
+[lints.clippy]
+unwrap_used = "warn"
+expect_used = "warn"
+dbg_macro = "warn"
+todo = "warn"

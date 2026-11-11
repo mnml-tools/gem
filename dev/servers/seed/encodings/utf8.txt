@@ -1,0 +1,1 @@
+UTF-8 sem BOM: olá, ação, 日本語, emoji 🎉

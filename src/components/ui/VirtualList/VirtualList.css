@@ -1,0 +1,13 @@
+/* VirtualList: a scroll container whose spacer has the height of every row. */
+.mnml-virtual-list {
+  position: relative;
+  overflow: auto;
+  min-height: 0;
+  overscroll-behavior: contain;
+  contain: content;
+}
+
+.mnml-virtual-list-spacer {
+  position: relative;
+  width: 100%;
+}

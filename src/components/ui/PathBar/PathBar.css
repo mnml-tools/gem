@@ -1,0 +1,113 @@
+/* PathBar: mono breadcrumbs split by faint slashes, like Zap's view heading. */
+.mnml-pathbar {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 26px;
+  font: 11px var(--mono);
+}
+
+.mnml-pathbar-nav {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.mnml-pathbar-nav ol {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+}
+
+.mnml-pathbar-nav li {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.mnml-pathbar-nav li[hidden] {
+  display: none;
+}
+
+/* The deepest crumb shrinks last (every leading crumb is folded by then), with an ellipsis, but
+   keeps ~10ch of its name (separator and padding on top): the smaller of that and its natural
+   width, which the bar measures into --mnml-pathbar-last. */
+.mnml-pathbar-nav li[data-last] {
+  flex-shrink: 1;
+  min-width: min(var(--mnml-pathbar-last, 0px), calc(11ch + 10px));
+}
+
+/* While the bar measures, every crumb keeps its natural width. */
+.mnml-pathbar-nav ol[data-measuring] li[data-last] {
+  flex-shrink: 0;
+}
+
+.mnml-pathbar-nav li[data-last] button {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mnml-pathbar-sep {
+  color: var(--faint);
+  margin: 0 1px;
+}
+
+.mnml-pathbar-nav button,
+.mnml-pathbar-more {
+  min-height: 22px;
+  padding: 2px 4px;
+  border: 0;
+  background: transparent;
+  color: var(--secondary);
+  font: inherit;
+}
+
+.mnml-pathbar-more {
+  flex-shrink: 0;
+}
+
+.mnml-pathbar-nav button:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.mnml-pathbar-nav button[aria-current] {
+  color: var(--text);
+}
+
+.mnml-pathbar-fill {
+  flex: 1;
+  justify-content: flex-end;
+  min-width: 26px;
+  min-height: 22px;
+  padding: 2px 6px;
+  border: 0;
+  background: transparent;
+  color: transparent;
+}
+
+.mnml-pathbar-fill:hover,
+.mnml-pathbar-fill:focus-visible {
+  background: transparent;
+  color: var(--icon);
+}
+
+.mnml-pathbar-input {
+  flex: 1;
+  min-width: 0;
+  height: 24px;
+  padding: 2px 6px;
+  border: 1px solid var(--focus);
+  background: var(--background);
+  font: inherit;
+  outline: none;
+}

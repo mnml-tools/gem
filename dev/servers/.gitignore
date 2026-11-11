@@ -1,0 +1,2 @@
+# The seed tree is test data: its .env is a synthetic sample, not a secret.
+!seed/samples/.env

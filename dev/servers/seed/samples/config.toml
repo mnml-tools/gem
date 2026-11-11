@@ -1,0 +1,14 @@
+# Synthetic TOML config.
+title = "demo"
+
+[server]
+host = "0.0.0.0"
+port = 8080
+
+[database]
+url = "postgres://demo@127.0.0.1/demo"
+pool = 10
+
+[[workers]]
+name = "mailer"
+concurrency = 2

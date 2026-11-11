@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-reorder-snippets"
+description = "Enables the reorder_snippets command without any pre-configured scope."
+commands.allow = ["reorder_snippets"]
+
+[[permission]]
+identifier = "deny-reorder-snippets"
+description = "Denies the reorder_snippets command without any pre-configured scope."
+commands.deny = ["reorder_snippets"]

@@ -1,0 +1,56 @@
+/* Toast: the kit's menu surface, bottom centre, above the status bar. */
+.mnml-toast-region {
+  position: fixed;
+  left: 50%;
+  bottom: 40px;
+  z-index: 600;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.mnml-toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(480px, calc(100vw - 32px));
+  min-height: 34px;
+  padding: 4px 4px 4px 12px;
+  border: 1px solid var(--faint);
+  background: var(--background);
+  box-shadow: 0 3px 10px var(--shadow);
+  color: var(--text);
+  font-size: 12px;
+  pointer-events: auto;
+  animation: mnml-toast-in var(--gem-duration-normal) ease-out;
+}
+
+.mnml-toast-icon {
+  flex-shrink: 0;
+  color: var(--gem-danger-text);
+}
+
+.mnml-toast-message {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mnml-toast-action {
+  border: 0;
+  background: transparent;
+  color: var(--gem-accent-text);
+  font-size: 11px;
+  min-height: 24px;
+  padding: 3px 6px;
+}
+
+.mnml-toast-close {
+  min-height: 24px;
+  width: 24px;
+}
+
+@keyframes mnml-toast-in {
+  from {
+    transform: translateY(4px);
+  }
+}
