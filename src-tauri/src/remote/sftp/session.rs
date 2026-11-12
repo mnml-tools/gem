@@ -288,13 +288,15 @@ async fn load_key(path: &str, passphrase: Option<&str>) -> AppResult<PrivateKey>
     match russh::keys::decode_secret_key(&text, passphrase) {
         Ok(key) => Ok(key),
         Err(russh::keys::Error::KeyIsEncrypted) => Err(AppError::SecretRequired),
+        Err(_) if passphrase.is_none() && is_encrypted_ppk(&text) => Err(AppError::SecretRequired),
         Err(error) => {
             // Decoding again without the passphrase tells "wrong passphrase" apart from a
             // corrupt or unsupported key.
-            let encrypted = matches!(
-                russh::keys::decode_secret_key(&text, None),
-                Err(russh::keys::Error::KeyIsEncrypted)
-            );
+            let encrypted = is_encrypted_ppk(&text)
+                || matches!(
+                    russh::keys::decode_secret_key(&text, None),
+                    Err(russh::keys::Error::KeyIsEncrypted)
+                );
             if passphrase.is_some() && encrypted {
                 Err(AppError::AuthFailed(format!(
                     "wrong passphrase for the key {path}"
@@ -306,6 +308,17 @@ async fn load_key(path: &str, passphrase: Option<&str>) -> AppResult<PrivateKey>
             }
         }
     }
+}
+
+/// Whether the text is a PuTTY key file with an encrypted private part. russh reports an
+/// encrypted PPK without a passphrase as a parse error rather than `KeyIsEncrypted`, so the
+/// header is read here.
+fn is_encrypted_ppk(text: &str) -> bool {
+    text.trim_start().starts_with("PuTTY-User-Key-File-")
+        && text.lines().any(|line| {
+            line.strip_prefix("Encryption:")
+                .is_some_and(|value| value.trim() != "none")
+        })
 }
 
 /// The signature hash for RSA keys: the best one the server announces (`server-sig-algs`),
@@ -490,4 +503,75 @@ pub async fn open_sftp(
         sftp.set_limits(Limits::from(limits));
     }
     Ok((sftp, extensions))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// PuTTY test keys from the `ssh-key` crate; the encrypted one's passphrase is `123`.
+    const PPK: &str = "PuTTY-User-Key-File-3: ssh-ed25519
+Encryption: none
+Comment: user@example.com
+Public-Lines: 2
+AAAAC3NzaC1lZDI1NTE5AAAAILM+rvN+ot98qgEN796jTiQfZfG1KaT0PtFDJ/XF
+Sqti
+Private-Lines: 1
+AAAAILYGwiLRDBba4WxwpNRRc0cuxhfgXGVpINJuVsCPtZHt
+Private-MAC: 94140d0344fad6aa1bf7b71e9c93db11ccac8a232f8a51e11c024869d608c82d
+";
+    const PPK_ENCRYPTED: &str = "PuTTY-User-Key-File-3: ssh-ed25519
+Encryption: aes256-cbc
+Comment: user@example.com
+Public-Lines: 2
+AAAAC3NzaC1lZDI1NTE5AAAAILM+rvN+ot98qgEN796jTiQfZfG1KaT0PtFDJ/XF
+Sqti
+Key-Derivation: Argon2id
+Argon2-Memory: 8192
+Argon2-Passes: 34
+Argon2-Parallelism: 1
+Argon2-Salt: 63d1d43f7bf7700720496646a2f5ec17
+Private-Lines: 1
+DyWtExZ3dxFutnb12tIwXBC6kWdozrvP+r6faHKBGDb4+qEar9XBiC0BmGySMHUi
+Private-MAC: 52fd00d4ef47ebc506e4e709486c0c6bc0606e24fe2c6cb1b3d168f4da238a66
+";
+
+    async fn load(contents: &str, passphrase: Option<&str>) -> AppResult<PrivateKey> {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("key.ppk");
+        std::fs::write(&path, contents).unwrap();
+        load_key(path.to_str().unwrap(), passphrase).await
+    }
+
+    #[tokio::test]
+    async fn loads_a_putty_key() {
+        let key = load(PPK, None).await.unwrap();
+        assert!(matches!(key.algorithm(), russh::keys::Algorithm::Ed25519));
+    }
+
+    #[tokio::test]
+    async fn asks_for_the_passphrase_of_an_encrypted_putty_key() {
+        assert!(matches!(
+            load(PPK_ENCRYPTED, None).await,
+            Err(AppError::SecretRequired)
+        ));
+        assert!(matches!(
+            load(PPK_ENCRYPTED, Some("")).await,
+            Err(AppError::SecretRequired)
+        ));
+        let windows = PPK_ENCRYPTED.replace('\n', "\r\n");
+        assert!(matches!(
+            load(&windows, None).await,
+            Err(AppError::SecretRequired)
+        ));
+    }
+
+    #[tokio::test]
+    async fn opens_an_encrypted_putty_key_with_its_passphrase() {
+        assert!(load(PPK_ENCRYPTED, Some("123")).await.is_ok());
+        match load(PPK_ENCRYPTED, Some("wrong")).await {
+            Err(AppError::AuthFailed(message)) => assert!(message.contains("wrong passphrase")),
+            other => panic!("expected a wrong passphrase error, got {other:?}"),
+        }
+    }
 }
