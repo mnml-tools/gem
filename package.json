@@ -1,6 +1,6 @@
 {
   "name": "gem",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Minimal remote file manager for SFTP, FTP and FTPS, with an in-place file viewer and editor.",
   "license": "MIT",

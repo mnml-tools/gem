@@ -6,6 +6,8 @@ All notable changes are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-12
+
 ### Added
 
 - **App icon** (an emerald-cut gem in the family's sticker style, on yellow) for the packages and
