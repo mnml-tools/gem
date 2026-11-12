@@ -62,5 +62,11 @@
     "resources": {
       "resources/THIRD_PARTY_LICENSES.md": "THIRD_PARTY_LICENSES.md"
     }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "",
+      "endpoints": ["https://github.com/mnml-tools/gem/releases/latest/download/latest.json"]
+    }
   }
 }

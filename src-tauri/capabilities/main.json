@@ -20,6 +20,7 @@
     "allow-choose-download-folder",
     "allow-open-download-folder",
     "allow-save-log",
+    "allow-open-release-notes",
     "allow-list-sites",
     "allow-create-site",
     "allow-update-site",

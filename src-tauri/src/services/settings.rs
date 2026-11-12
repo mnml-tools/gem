@@ -107,6 +107,7 @@ mod tests {
                         preview_window_kib: 1,
                         conflict_policy: ConflictPolicy::Rename,
                         show_hidden: true,
+                        check_updates: false,
                         ..Settings::default()
                     },
                 )
@@ -117,6 +118,7 @@ mod tests {
         assert_eq!(saved.preview_window_kib, 64);
         assert_eq!(db.read(get).unwrap(), saved);
         assert_eq!(saved.conflict_policy, ConflictPolicy::Rename);
+        assert!(!saved.check_updates);
     }
 
     #[test]

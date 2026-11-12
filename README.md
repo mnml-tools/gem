@@ -155,7 +155,13 @@ checks, then builds Linux `.deb`, `.rpm` and AppImage packages, a universal macO
 To publish a release, update the version in `package.json`, `src-tauri/Cargo.toml`,
 `src-tauri/Cargo.lock` and `src-tauri/tauri.conf.json`, commit, and push a matching tag
 (`git tag v0.1.0 && git push origin v0.1.0`). The release gets every package and a
-`SHA256SUMS.txt`. There is no auto-updater yet.
+`SHA256SUMS.txt`, and a `latest.json` for the in-app updater (ADR 0015).
+
+Tag builds sign the updater packages, so the repository needs three Actions secrets first:
+`TAURI_UPDATER_PUBLIC_KEY`, `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`.
+Create the key pair once with `pnpm tauri signer generate -w ~/.tauri/gem.key` and keep the
+private key safe: installed copies only accept updates signed with it. Tags with a suffix
+(`v0.2.0-beta.1`) are published as prereleases, which the updater ignores.
 
 ## Development checks
 

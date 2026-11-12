@@ -21,4 +21,8 @@ transferConcurrency: number,
 /**
  * Seconds between keepalives (0 disables them).
  */
-keepaliveSecs: number, showHidden: boolean, conflictPolicy: ConflictPolicy, };
+keepaliveSecs: number, showHidden: boolean, conflictPolicy: ConflictPolicy, 
+/**
+ * Look for a new version when Gem starts (installing it still asks).
+ */
+checkUpdates: boolean, };

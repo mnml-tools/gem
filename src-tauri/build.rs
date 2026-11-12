@@ -12,6 +12,7 @@ const COMMANDS: &[&str] = &[
     "choose_download_folder",
     "open_download_folder",
     "save_log",
+    "open_release_notes",
     "list_sites",
     "create_site",
     "update_site",

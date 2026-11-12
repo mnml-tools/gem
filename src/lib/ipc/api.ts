@@ -48,6 +48,8 @@ export const api = {
   /** Native save dialog for a log; `false` when cancelled. */
   saveLog: (text: string, suggestedName: string) =>
     call<boolean>('save_log', { text, suggestedName }),
+  /** Opens the latest release notes in the default browser. */
+  openReleaseNotes: () => call<void>('open_release_notes'),
 
   // Sites
   listSites: () => call<Site[]>('list_sites'),

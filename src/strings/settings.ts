@@ -19,6 +19,21 @@ export const settingsStrings = {
   invalid: 'Check the highlighted values',
 } as const;
 
+export const updateStrings = {
+  section: 'Updates',
+  checkAtStartup: 'Check for updates when Gem starts',
+  checkNow: 'Check for updates',
+  checking: 'Checking…',
+  version: (version: string) => `Gem ${version}`,
+  upToDate: 'Gem is up to date.',
+  available: (version: string) => `Gem ${version} is available.`,
+  failed: (message: string) => `Could not check for updates: ${message}`,
+  desktopOnly: 'Updates are checked in the desktop app.',
+  busy: 'Wait for the transfers to finish, or cancel them, before updating.',
+  discard:
+    'Unsaved files will be lost. Cancel to save them first, or discard the changes and update.',
+} as const;
+
 export const helpStrings = {
   title: 'Keyboard shortcuts',
 } as const;

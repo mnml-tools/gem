@@ -42,3 +42,9 @@ All notable changes are documented here. The format follows
 - **Connection log at the bottom,** with commands, replies and errors, passwords always masked,
   copy and "Save log…".
 - Light and dark mode and five accents, shared with the other mnml-tools apps.
+- **In-app updates:** Gem checks for a new version when it starts (Settings › Check for updates
+  when Gem starts, or "Check for updates" by hand) and offers to install it and restart. Running
+  transfers block the update and unsaved files ask first. Each package type (AppImage, `.deb`,
+  `.rpm`, macOS app, NSIS, MSI) updates with its own kind of package.
+- **PuTTY keys:** SFTP sites can use `.ppk` key files (PuTTY format 2 and 3) directly; Gem asks
+  for the passphrase of an encrypted one like for any other key.

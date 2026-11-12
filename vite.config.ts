@@ -9,14 +9,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      // The kit's `tauri` entry imports two optional peers that only its updater uses; Gem has
-      // no updater (plan §10.2), so they resolve to a stub (src/app/kitOptionalPlugins.ts).
-      '@tauri-apps/plugin-process': fileURLToPath(
-        new URL('./src/app/kitOptionalPlugins.ts', import.meta.url),
-      ),
-      '@tauri-apps/plugin-updater': fileURLToPath(
-        new URL('./src/app/kitOptionalPlugins.ts', import.meta.url),
-      ),
     },
   },
   // Tauri expects a fixed port and must see Rust errors in the terminal. Gem's own port (1426,
@@ -43,7 +35,5 @@ export default defineConfig({
     setupFiles: ['src/test/setup.ts'],
     restoreMocks: true,
     css: false,
-    // Inline the kit so the optional-plugin aliases above also apply inside it.
-    server: { deps: { inline: ['@mnml-tools/ui'] } },
   },
 });

@@ -1,9 +1,12 @@
 import { EditorView } from '@codemirror/view';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import type { Update } from '@tauri-apps/plugin-updater';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { MockControls } from '@/dev/mock-backend';
 import { api } from '@/lib/ipc/api';
+import { useSessionData } from '@/state/sessionData';
+import { useUpdates } from '@/state/updates';
 import { cleanupApp, renderApp } from '@/test/render';
 
 afterEach(() => cleanupApp());
@@ -638,5 +641,57 @@ describe('polish', () => {
     const tabs = screen.getByRole('navigation', { name: 'Connections' });
     await waitFor(() => expect(within(tabs).getByText('gem@127.0.0.1 (2)')).toBeInTheDocument());
     expect(within(tabs).getByText('gem@127.0.0.1')).toBeInTheDocument();
+  });
+});
+
+describe('updates (ADR 0015)', () => {
+  const offer = () => {
+    const update = {
+      version: '0.2.0',
+      close: vi.fn(() => Promise.resolve()),
+      downloadAndInstall: vi.fn(() => Promise.resolve()),
+    };
+    useUpdates.setState({ update: update as unknown as Update });
+    return update;
+  };
+
+  it('offers a found update, and "Later" dismisses it', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const update = offer();
+    const dialog = await screen.findByRole('dialog', { name: 'Gem 0.2.0 is available' });
+    await user.click(within(dialog).getByRole('button', { name: 'Later' }));
+    expect(screen.queryByRole('dialog', { name: /is available/ })).not.toBeInTheDocument();
+    expect(update.close).toHaveBeenCalled();
+  });
+
+  it('does not install while transfers are running', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    useSessionData.setState({
+      transfers: {
+        tab: [
+          {
+            id: 't1',
+            sessionId: 's1',
+            direction: 'download',
+            name: 'big.iso',
+            localPath: '/tmp/big.iso',
+            remotePath: '/big.iso',
+            size: 100,
+            done: 10,
+            state: 'running',
+            error: null,
+            startedAt: 0,
+            finishedAt: null,
+          },
+        ],
+      },
+    });
+    const update = offer();
+    const dialog = await screen.findByRole('dialog', { name: 'Gem 0.2.0 is available' });
+    await user.click(within(dialog).getByRole('button', { name: 'Install and restart' }));
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('Wait for the transfers to finish');
+    expect(update.downloadAndInstall).not.toHaveBeenCalled();
   });
 });

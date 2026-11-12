@@ -260,8 +260,10 @@ of full sessions and checks). The protocol crates' own `log` output is pinned to
 ## Security boundaries
 
 - **Webview:** CSP `default-src 'self'`, `connect-src ipc: http://ipc.localhost`, no inline
-  scripts, `freezePrototype`, `withGlobalTauri: false`, no `plugin:*` JavaScript permissions.
-  The one capability (`capabilities/main.json`) grants each app command plus window controls.
+  scripts, `freezePrototype`, `withGlobalTauri: false`. `capabilities/main.json` grants each app
+  command plus window controls; the only `plugin:*` JavaScript permissions are the updater's
+  check/install and the restart after it (`capabilities/updater.json`, ADR 0015). Updates are
+  verified against the updater public key before they are installed.
 - **Navigation lock:** the window only shows the app's own pages; new windows are denied
   (`platform/navigation.rs`).
 - **Local paths** come only from native dialogs or OS drops handled in Rust; the webview sees

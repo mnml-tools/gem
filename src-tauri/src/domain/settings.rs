@@ -22,6 +22,8 @@ pub struct Settings {
     pub keepalive_secs: u32,
     pub show_hidden: bool,
     pub conflict_policy: ConflictPolicy,
+    /// Look for a new version when Gem starts (installing it still asks).
+    pub check_updates: bool,
 }
 
 impl Default for Settings {
@@ -34,6 +36,7 @@ impl Default for Settings {
             keepalive_secs: 30,
             show_hidden: false,
             conflict_policy: ConflictPolicy::Ask,
+            check_updates: true,
         }
     }
 }

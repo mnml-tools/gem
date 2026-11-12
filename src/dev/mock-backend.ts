@@ -88,6 +88,7 @@ const DEFAULT_SETTINGS: Settings = {
   keepaliveSecs: 30,
   showHidden: false,
   conflictPolicy: 'ask',
+  checkUpdates: true,
 };
 
 const FINGERPRINTS: Record<string, string> = {
@@ -607,6 +608,10 @@ export function createMockBackend(options: MockOptions) {
     save_log: ({ suggestedName }) => {
       log(`save log as ${String(suggestedName)}`);
       return true;
+    },
+    open_release_notes: () => {
+      log('open release notes');
+      return null;
     },
 
     list_sites: () => [...sites].sort((a, b) => a.sortOrder - b.sortOrder),

@@ -37,6 +37,7 @@ macro_rules! app_commands {
             $crate::commands::app::choose_download_folder,
             $crate::commands::app::open_download_folder,
             $crate::commands::app::save_log,
+            $crate::commands::app::open_release_notes,
             $crate::commands::sites::list_sites,
             $crate::commands::sites::create_site,
             $crate::commands::sites::update_site,
@@ -106,6 +107,8 @@ pub fn run() {
         )
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .setup(setup)
         .on_window_event(|window, event| {
             if let WindowEvent::DragDrop(drop) = event {

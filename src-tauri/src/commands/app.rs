@@ -75,6 +75,18 @@ pub async fn open_download_folder<R: Runtime>(app: AppHandle<R>) -> AppResult<()
         .map_err(|e| AppError::Platform(format!("could not open the folder: {e}")))
 }
 
+/// The latest release's page, opened by the update dialog's "What's new".
+const RELEASE_NOTES_URL: &str = "https://github.com/mnml-tools/gem/releases/latest";
+
+/// Opens the latest release notes in the default browser. The URL is fixed here: the webview
+/// cannot open arbitrary links.
+#[tauri::command]
+pub async fn open_release_notes<R: Runtime>(app: AppHandle<R>) -> AppResult<()> {
+    app.opener()
+        .open_url(RELEASE_NOTES_URL, None::<&str>)
+        .map_err(|e| AppError::Platform(format!("could not open the release notes: {e}")))
+}
+
 /// Native save dialog for a connection log. False when cancelled.
 #[tauri::command]
 pub async fn save_log<R: Runtime>(

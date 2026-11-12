@@ -10,13 +10,14 @@ import {
   ConfirmDialog,
   IconButton,
   registerShortcut,
+  registerUpdateGuard,
   Separator,
   StatusBar,
   ThemeToggle,
   TitleBar,
   useShortcut,
 } from '@mnml-tools/ui';
-import { WindowControls } from '@mnml-tools/ui/tauri';
+import { UpdateDialog, WindowControls } from '@mnml-tools/ui/tauri';
 import { useQueryClient } from '@tanstack/react-query';
 import { Settings as SettingsIcon } from 'lucide-react';
 import { BrandGlyph } from './BrandGlyph';
@@ -27,6 +28,7 @@ import { SplitPane } from '@/components/ui/SplitPane/SplitPane';
 import { ToastProvider } from '@/components/ui/Toast/Toast';
 import { installDialogGuard } from '@/lib/dialogGuard';
 import { formatSpeed } from '@/lib/format';
+import { api } from '@/lib/ipc/api';
 import { useSettings, useSites } from '@/lib/query/hooks';
 import { queryKeys } from '@/lib/query/keys';
 import { useWindowShortcut } from '@/lib/hooks/useWindowShortcut';
@@ -34,6 +36,7 @@ import { keys, SHORTCUTS, TAB_NUMBER_SHORTCUTS } from '@/lib/shortcuts';
 import { PROTOCOL_LABEL } from '@/lib/sites';
 import { transferSummary, useSessionData, useTransfers } from '@/state/sessionData';
 import { useUi } from '@/state/ui';
+import { useStartupUpdateCheck, useUpdates } from '@/state/updates';
 import { closeActiveFileTab } from '@/state/viewerCommands';
 import {
   tabLabels,
@@ -45,6 +48,7 @@ import {
 import { common } from '@/strings/common';
 import { commandStrings } from '@/strings/commands';
 import { panelStrings } from '@/strings/panel';
+import { updateStrings } from '@/strings/settings';
 import { workspaceStrings as t } from '@/strings/workspace';
 import { CommandPalette } from '../commands/CommandPalette';
 import { onRunEnd, snippetSpec, startCommand } from '../commands/runner';
@@ -173,6 +177,18 @@ function Workspace() {
 
   // Dialogs that open mid-gesture (a host-key prompt after Connect) ignore that gesture.
   useEffect(() => installDialogGuard(), []);
+
+  // Updating restarts Gem: running transfers block it, unsaved files ask first (ADR 0015).
+  useStartupUpdateCheck();
+  const update = useUpdates((state) => state.update);
+  useEffect(
+    () =>
+      registerUpdateGuard(() => {
+        const work = pendingWork();
+        return { dirty: work.dirty > 0, busy: work.transfers > 0 };
+      }),
+    [],
+  );
 
   useWindowCloseGuard((confirm) => {
     const work = pendingWork();
@@ -377,6 +393,17 @@ function Workspace() {
             setClosing(null);
             closing.confirm();
           }}
+        />
+      )}
+      {update && !ui.settingsOpen && (
+        <UpdateDialog
+          update={update}
+          appName="Gem"
+          releaseNotesUrl="https://github.com/mnml-tools/gem/releases/latest"
+          onOpenReleaseNotes={api.openReleaseNotes}
+          busyMessage={updateStrings.busy}
+          discardMessage={updateStrings.discard}
+          onDismiss={() => useUpdates.getState().dismiss()}
         />
       )}
     </AppShell>

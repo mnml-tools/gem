@@ -9,6 +9,7 @@ import { installMock } from '@/dev/install';
 import { useFileTabs } from '@/state/fileTabs';
 import { useSessionData } from '@/state/sessionData';
 import { useUi } from '@/state/ui';
+import { useUpdates } from '@/state/updates';
 import { useWorkspace } from '@/state/workspace';
 import WorkspaceApp from '@/views/workspace/WorkspaceApp';
 
@@ -21,6 +22,7 @@ export function resetStores(): void {
   useWorkspace.setState({ tabs: [], activeId: null });
   useFileTabs.setState({ byConn: {} });
   useUi.setState({ settingsOpen: false, helpOpen: false, siteDialog: null });
+  useUpdates.setState({ update: null, checking: false, message: null, error: null });
   useSessionData.setState({
     panelOpen: true,
     panelView: 'log',

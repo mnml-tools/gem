@@ -13,6 +13,7 @@ export const DEFAULT_SETTINGS: Settings = {
   keepaliveSecs: 30,
   showHidden: false,
   conflictPolicy: 'ask',
+  checkUpdates: true,
 };
 
 export function useSettings(): Settings {

@@ -1,10 +1,11 @@
 /**
  * Settings (plan §6, Phase 6): download folder, preview window, confirmation threshold,
- * concurrency, keepalive, hidden files, conflict policy. Appearance stays in the kit's
- * ThemeToggle, as in every family app.
+ * concurrency, keepalive, hidden files, conflict policy, updates (ADR 0015). Appearance stays in
+ * the kit's ThemeToggle, as in every family app.
  */
 import { Button, Dialog, Fields, Message, Spinner } from '@mnml-tools/ui';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { isTauri } from '@tauri-apps/api/core';
 import { FolderOpen, Keyboard } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/components/ui/Toast/context';
@@ -13,11 +14,12 @@ import { api } from '@/lib/ipc/api';
 import type { ConflictPolicy } from '@/lib/ipc/bindings/ConflictPolicy';
 import type { Settings } from '@/lib/ipc/bindings/Settings';
 import { errorMessage } from '@/lib/errors';
-import { DEFAULT_SETTINGS } from '@/lib/query/hooks';
+import { DEFAULT_SETTINGS, useAppStatus } from '@/lib/query/hooks';
 import { queryKeys } from '@/lib/query/keys';
 import { common } from '@/strings/common';
 import { useUi } from '@/state/ui';
-import { helpStrings, settingsStrings as t } from '@/strings/settings';
+import { useUpdates } from '@/state/updates';
+import { helpStrings, settingsStrings as t, updateStrings } from '@/strings/settings';
 
 const WINDOWS_KIB = [512, 1024, 2048, 4096, 8192, 16384];
 const POLICIES: ConflictPolicy[] = ['ask', 'overwrite', 'skip', 'rename'];
@@ -29,6 +31,7 @@ type Draft = {
   keepaliveSecs: string;
   showHidden: boolean;
   conflictPolicy: ConflictPolicy;
+  checkUpdates: boolean;
 };
 
 const toDraft = (settings: Settings): Draft => ({
@@ -38,6 +41,7 @@ const toDraft = (settings: Settings): Draft => ({
   keepaliveSecs: String(settings.keepaliveSecs),
   showHidden: settings.showHidden,
   conflictPolicy: settings.conflictPolicy,
+  checkUpdates: settings.checkUpdates,
 });
 
 function wholeNumber(text: string, min: number, max: number): number | null {
@@ -88,6 +92,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
         keepaliveSecs: keepalive,
         showHidden: value.showHidden,
         conflictPolicy: value.conflictPolicy,
+        checkUpdates: value.checkUpdates,
       });
       queryClient.setQueryData(queryKeys.settings, saved);
       toast.show({ message: t.saved });
@@ -207,6 +212,11 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
             />
             <span>{t.showHidden}</span>
           </label>
+          <UpdatesField
+            checkAtStartup={value.checkUpdates}
+            onCheckAtStartup={(checkUpdates) => change({ checkUpdates })}
+            onFound={onClose}
+          />
         </Fields>
         <p className="gem-dialog-hint">
           {t.previewHint} {t.appearanceHint}
@@ -235,5 +245,54 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
         </div>
       </form>
     </Dialog>
+  );
+}
+
+/** The running version, "Check for updates" and whether Gem checks at startup. */
+function UpdatesField({
+  checkAtStartup,
+  onCheckAtStartup,
+  onFound,
+}: {
+  checkAtStartup: boolean;
+  onCheckAtStartup: (value: boolean) => void;
+  /** Closes Settings so the update dialog shows. */
+  onFound: () => void;
+}) {
+  const version = useAppStatus().data?.version;
+  const { checking, message, error } = useUpdates();
+  const supported = isTauri();
+  const status = !supported
+    ? updateStrings.desktopOnly
+    : (error ?? message ?? (version ? updateStrings.version(version) : ''));
+  return (
+    <>
+      <div className="gem-field mnml-field-full">
+        <span>{updateStrings.section}</span>
+        <div className="gem-key-picker">
+          <span className="gem-key-path" role="status" title={status}>
+            {status}
+          </span>
+          <Button
+            type="button"
+            disabled={!supported || checking}
+            onClick={async () => {
+              if (await useUpdates.getState().check()) onFound();
+            }}
+          >
+            {checking && <Spinner size={13} />}
+            {checking ? updateStrings.checking : updateStrings.checkNow}
+          </Button>
+        </div>
+      </div>
+      <label className="gem-check gem-settings-check">
+        <input
+          type="checkbox"
+          checked={checkAtStartup}
+          onChange={(event) => onCheckAtStartup(event.target.checked)}
+        />
+        <span>{updateStrings.checkAtStartup}</span>
+      </label>
+    </>
   );
 }
